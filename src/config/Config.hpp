@@ -3,17 +3,19 @@
 #include "ConfigLoader.hpp"
 #include <vector>
 
+///////////////////////////////基类与各种枚举////////////////////////////////
+
 /// @brief 主题容器基类
 class SubjectBase
 {
 public:
-    virtual void addObserver(ObserverBase *observer);        ///< 添加观察者
-    virtual void removeObserver(ObserverBase *observer);     ///< 删除观察者
-    virtual void notifyAllObservers(ObserverBase *observer); ///< 通知所有观察者
-    virtual void notifyObservers(ObserverBase *observer);    ///< 通知所有观察者
+    virtual void addObserver(ObserverBase *observer) = 0;                                    ///< 添加观察者
+    virtual void removeObserver(ObserverBase *observer) = 0;                                 ///< 删除观察者
+    virtual void notifyObservers(ObserverBase *observer, const StateChangeEvent &event) = 0; ///< 通知单个观察者
+    virtual void notifyAllObservers(const StateChangeEvent &event) = 0;                      ///< 通知所有观察者
     virtual ~SubjectBase() = default;
 
-private:
+protected:
     std::vector<ObserverBase *> mObserversContainer; ///< 观察者容器池
 };
 
@@ -74,4 +76,21 @@ public:
     virtual ~ObserverBase() = default;
 };
 
+///////////////////////////////config相关实现类/////////////////////////////////
+/// @brief 配置检查器主题类
+class ConfigSubject : public SubjectBase
+{
+public:
+    void addObserver(ObserverBase *observer) override;                                    ///< 添加观察者
+    void removeObserver(ObserverBase *observer) override;                                 ///< 删除观察者
+    void notifyAllObservers(const StateChangeEvent &event) override;                      ///< 通知所有观察者
+    void notifyObservers(ObserverBase *observer, const StateChangeEvent &event) override; ///< 通知单个观察者
+};
+/// @brief 配置观察者类
+class configObserver : public ObserverBase
+{
+public:
+    void stateChanged(const StateChangeEvent &event) override;
+    // void stateChanged(const std::function<void()>& func) override; 传入函数对象或lambda 也可以用模板实现，后续考虑升级
+};
 #endif
