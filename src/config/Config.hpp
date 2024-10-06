@@ -1,8 +1,13 @@
 #ifndef _Config_hpp_
 #define _Config_hpp_
-#include "ConfigLoader.hpp"
 #include <vector>
-
+#include <string>
+#include <algorithm>
+#include <thread>
+#include <atomic>
+#include <iostream>
+#include <map>
+#include <functional>
 ///////////////////////////////基类与各种枚举////////////////////////////////
 
 /// @brief 主题容器基类
@@ -92,5 +97,30 @@ class configObserver : public ObserverBase
 public:
     void stateChanged(const StateChangeEvent &event) override;
     // void stateChanged(const std::function<void()>& func) override; 传入函数对象或lambda 也可以用模板实现，后续考虑升级
+};
+
+/// @brief 静态全局配置文件管理器，后续考虑单例模式
+class configManager
+{
+public:
+    void addConfigFile(const std::string &configPath, configObserver *observer); ///< 加载配置文件,并添加观察者
+    void watchConfig(const std::string &configPath);                             ///< 配置文件修改更新的监听器，修改时候通知所有观察者
+    void removeConfig(const std::string &configPath);                            ///< 删除配置文件，同时删除对应的主题，清空所有观察者
+    void getConfig(const std::string &configPath);                               ///< 得到对应的配置文件内容
+    // 设计思路：
+    // 1. addConfigFile 加载配置文件就向检查mConfigSubjectMap是否存在<文件路径，配置主题容器>，存在就将观察者加入配置主题容器，不存在就构造一个，并加入
+    // 2. watchConfig 监听配置文件就向mConfigSubjectMap查询是否存在这个路径以及配置主题容器，如果有就以这个路径的文件，启动监听线程监听修改或删除，修改就通知所有观察者
+    // 3. removeConfig 就从mConfigSubjectMap中删除配置文件，同时删除对应的主题，清空所有观察者
+    // 4. getConfig 读取配置文件，直接从mConfigSubjectMap中读取，如果存在就返回，不存在就返回空
+    static configManager &instance();
+
+private:
+    configManager() = default;                                ///< 禁止直接构造
+    configManager(const configManager &) = delete;            ///< 禁止拷贝构造
+    configManager &operator=(const configManager &) = delete; ///< 禁止拷贝赋值
+    
+    std::thread *mWatchThread{nullptr};                       ///< 配置文件状态监听器线程对象
+    std::atomic<bool> mStopThread{false};                     ///< 原子线程停止标志
+    std::map<std::string, ConfigSubject> mConfigSubjectMap;   ///< 管理多个文件的配置主题
 };
 #endif

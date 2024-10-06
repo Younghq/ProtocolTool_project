@@ -1,13 +1,13 @@
 # 设置库名称
 set(CONFIG_LIB_NAME config)
 
-# 指定源文件和头文件
-set(CONFIG_SOURCES
-
-)
-
+# 指定头文件和源文件
 set(CONFIG_HEADERS
     Config.hpp
+)
+set(CONFIG_SOURCES
+    ConfigSubject.cpp
+    ConfigObserver.cpp
 )
 
 # 创建静态库
