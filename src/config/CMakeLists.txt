@@ -3,13 +3,11 @@ set(CONFIG_LIB_NAME config)
 
 # 指定源文件和头文件
 set(CONFIG_SOURCES
-    ConfigLoader.cpp  # 加载配置文件的实现
+
 )
 
 set(CONFIG_HEADERS
-    ConfigLoader.hpp  # 加载配置文件的头文件
-    ConfigSubject.hpp  # 主题类头文件
-    ConfigObserver.hpp  # 观察者类头文件
+    Config.hpp
 )
 
 # 创建静态库
