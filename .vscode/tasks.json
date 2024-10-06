@@ -1,0 +1,27 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "CMake: build",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build",
+                ".",
+                "--config",
+                "Debug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "detail": "Generated task by CMake Tools.",
+            "options": {
+                "cwd": "${workspaceFolder}/build" // 确保 cwd 设置为 build 目录
+            }
+        }
+    ]
+}
